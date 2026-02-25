@@ -1,5 +1,5 @@
 import "server-only"; // KUNCI UTAMA: Biar logic database gak bocor ke browser mang
-import { PrismaClient } from '../app/generated/prisma/client'
+import { PrismaClient } from '@/prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 
