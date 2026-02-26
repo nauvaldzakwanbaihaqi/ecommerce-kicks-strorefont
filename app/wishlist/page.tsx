@@ -1,7 +1,9 @@
 import { Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import prisma, { USER_ID } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import prisma from "@/lib/prisma";
 import WishlistItemCard from "@/components/WishlistItemCard";
 
 export const dynamic = 'force-dynamic';
@@ -25,21 +27,29 @@ interface Wishlist {
 }
 
 export default async function WishlistPage() {
-    const wishlist = await prisma.wishlist.findFirst({
-        where: { userId: USER_ID },
-        include: {
-            items: {
-                orderBy: { createdAt: 'desc' },
-                include: {
-                    product: {
-                        include: { images: true }
+    // 1. Panggil session NextAuth
+    const session = await getServerSession(authOptions);
+
+    let items: WishlistItem[] = [];
+
+    // 2. Cek apakah user udah login sebelum manggil Prisma
+    if (session?.user?.id) {
+        const wishlist = await prisma.wishlist.findFirst({
+            where: { userId: session.user.id }, // 👈 Pake ID asli dari session mang!
+            include: {
+                items: {
+                    orderBy: { createdAt: 'desc' },
+                    include: {
+                        product: {
+                            include: { images: true }
+                        }
                     }
                 }
             }
-        }
-    }) as Wishlist | null;
+        }) as Wishlist | null;
 
-    const items = wishlist?.items || [];
+        items = wishlist?.items || [];
+    }
 
     return (
         <div className="max-w-11/12 mx-auto min-h-screen pt-10 pb-20 px-4 md:px-10">
@@ -61,12 +71,16 @@ export default async function WishlistPage() {
                             <Heart size={32} className="text-gray-300" />
                         </div>
                         <h2 className="text-xl font-bold uppercase">It&apos;s empty here</h2>
+                        
+                        {/* 3. Kasih tau user buat login kalau emang belum login */}
                         <p className="text-gray-400 max-w-xs">
-                            You haven&apos;t saved any sneakers yet. Go find your favorite pair!
+                            {session?.user?.id 
+                                ? "You haven't saved any sneakers yet. Go find your favorite pair!" 
+                                : "Please login to see your saved sneakers."}
                         </p>
-                        <Link href="/products">
+                        <Link href={session?.user?.id ? "/products" : "/login"}>
                             <Button className="mt-4 bg-[#232321] px-8 rounded-xl font-bold uppercase">
-                                Browse Sneakers
+                                {session?.user?.id ? "Browse Sneakers" : "Login Now"}
                             </Button>
                         </Link>
                     </div>

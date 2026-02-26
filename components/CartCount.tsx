@@ -1,9 +1,17 @@
-import prisma, { USER_ID } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"; 
 
 export default async function CartCount() {
     try {
+        // Ambil session user pake cara NextAuth v4
+        const session = await getServerSession(authOptions); 
+        
+        // Kalau gak ada user login, gak usah nampilin angka keranjang
+        if (!session?.user?.id) return null;
+
         const cart = await prisma.cart.findUnique({
-            where: { userId: USER_ID },
+            where: { userId: session.user.id }, // Pake ID asli dari session
             include: { items: true }
         });
 
