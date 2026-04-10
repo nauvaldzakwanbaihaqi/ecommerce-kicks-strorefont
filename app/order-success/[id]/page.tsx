@@ -8,11 +8,10 @@ import { redirect } from "next/navigation";
 export default async function OrderSuccessPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
-    // 🔥 JURUS ANTI-ERROR: Kita paksa 'as any' langsung di dalem findUnique biar TypeScript diem
     const order = await prisma.order.findUnique({
         where: { id: id },
         include: {
-            shippingAddress: true,
+            shipping: true,
             items: {
                 include: {
                     variant: { 
@@ -24,8 +23,8 @@ export default async function OrderSuccessPage({ params }: { params: Promise<{ i
                     }
                 }
             }
-        } as any // 👈 Tambahin 'as any' di sini mang!
-    }) as any; 
+        }
+    }); 
 
     if (!order) {
         redirect("/");
@@ -66,11 +65,11 @@ export default async function OrderSuccessPage({ params }: { params: Promise<{ i
                             </h3>
                             <div className="bg-[#F4F4F4] p-5 rounded-2xl text-sm font-medium text-gray-600 space-y-1">
                                 <p className="font-bold text-black uppercase text-base">
-                                    {order.shippingAddress?.firstName} {order.shippingAddress?.lastName}
+                                    {order.shipping?.firstName} {order.shipping?.lastName}
                                 </p>
-                                <p>{order.shippingAddress?.address}</p>
-                                <p>{order.shippingAddress?.city}, {order.shippingAddress?.postalCode}</p>
-                                <p className="pt-2 font-bold text-black">📞 {order.shippingAddress?.phone}</p>
+                                <p>{order.shipping?.address}</p>
+                                <p>{order.shipping?.city}, {order.shipping?.postalCode}</p>
+                                <p className="pt-2 font-bold text-black">📞 {order.shipping?.phone}</p>
                             </div>
                         </div>
 

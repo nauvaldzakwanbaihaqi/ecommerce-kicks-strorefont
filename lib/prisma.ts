@@ -1,5 +1,5 @@
 import "server-only"; // KUNCI UTAMA: Biar logic database gak bocor ke browser
-import { PrismaClient } from "@prisma/client"; // ✅ Pake jalan resmi biar Vercel kenal
+import { PrismaClient } from "@prisma/client"; // 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
