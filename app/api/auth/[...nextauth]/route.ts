@@ -2,9 +2,9 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { z } from "zod"; // 1. Import Zod-nya mang!
+import { z } from "zod";
 
-// 2. KELUARIN SETTINGANNYA KE VARIABEL YANG DI-EXPORT!
+// Export auth options for use in other modules
 export const authOptions: NextAuthOptions = {
     providers: [
         CredentialsProvider({
@@ -14,19 +14,19 @@ export const authOptions: NextAuthOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                // 3. ZOD BERAKSI DI SINI: Validasi input sebelum nyentuh database!
+                // Validate input before querying the database
                 const parsedCredentials = z.object({
-                    email: z.string().email("Format email salah mang!"),
-                    password: z.string().min(1, "Password nggak boleh kosong!") // Sesuaikan minimal karakternya kalau mau
+                    email: z.string().email("Invalid email format."),
+                    password: z.string().min(1, "Password is required.")
                 }).safeParse(credentials);
 
-                // Kalau Zod bilang formatnya salah, langsung tendang (return null)
+                // Reject if validation fails
                 if (!parsedCredentials.success) {
                     console.log("LOGIN_DEBUG: Zod Error ->", parsedCredentials.error.message);
                     return null;
                 }
 
-                // Kalau lolos Zod, ambil data yang udah "bersih"
+                // Extract validated data
                 const { email, password } = parsedCredentials.data;
 
                 try {
@@ -90,7 +90,7 @@ export const authOptions: NextAuthOptions = {
     debug: process.env.NODE_ENV === "development",
 };
 
-// 4. MASUKIN authOptions KE DALAM HANDLER
+// Initialize NextAuth handler with auth options
 const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

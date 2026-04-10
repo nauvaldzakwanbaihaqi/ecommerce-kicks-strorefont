@@ -28,8 +28,8 @@ export default function ProductInfo({ product, isWishlisted }: ProductInfoProps)
     // 1. UPDATE LOGIC ADD TO CART MANG!
     const handleAddToCart = () => {
         if (!selectedSize) {
-            toast.error("Pilih size dulu mang! 👟", {
-                description: "Jangan buru-buru, pastiin ukurannya pas."
+            toast.error("Please select a size", {
+                description: "Choose your preferred size before adding to cart."
             });
             return;
         }
@@ -51,25 +51,25 @@ export default function ProductInfo({ product, isWishlisted }: ProductInfoProps)
 
                 // Kalau pelayannya bilang "Belum Login!" (Status 401)
                 if (res.status === 401) {
-                    toast.error("Eits, login dulu mang! 🛑", {
-                        description: "Biar keranjangnya nggak ketuker sama orang lain."
+                    toast.error("Authentication required", {
+                        description: "Please sign in to add items to your cart."
                     });
                     router.push("/login"); // Tendang ke halaman login!
                     return;
                 }
 
                 if (!res.ok) {
-                    throw new Error(data.error || "Gagal masuk keranjang");
+                    throw new Error(data.error || "Failed to add item to cart");
                 }
 
-                toast.success("Berhasil masuk keranjang! 🛒", {
-                    description: `${product.name} (Size ${selectedSize}) siap bungkus.`,
+                toast.success("Item added to cart", {
+                    description: `${product.name} (Size ${selectedSize}) has been added successfully.`,
                 });
                 
                 // Refresh biar angka di icon ShoppingBag Navbar otomatis nambah!
                 router.refresh(); 
             } catch (error: any) {
-                toast.error(error.message || "Gagal masuk keranjang, coba lagi!");
+                toast.error(error.message || "Failed to add item to cart. Please try again.");
             }
         });
     };
@@ -79,7 +79,7 @@ export default function ProductInfo({ product, isWishlisted }: ProductInfoProps)
         e.preventDefault();
 
         if (!selectedSize) {
-            toast.error("Pilih size dulu mang! 👟");
+            toast.error("Please select a size before proceeding.");
             return;
         }
 
@@ -96,18 +96,18 @@ export default function ProductInfo({ product, isWishlisted }: ProductInfoProps)
                 });
 
                 if (res.status === 401) {
-                    toast.error("Eits, login dulu mang! 🛑");
+                    toast.error("Authentication required. Please sign in to continue.");
                     router.push("/login");
                     return;
                 }
 
-                if (!res.ok) throw new Error("Gagal proses beli langsung");
+                if (!res.ok) throw new Error("Unable to process your purchase");
 
-                toast.info("Otw keranjang belanja...", { duration: 1000 });
+                toast.info("Redirecting to your cart...", { duration: 1000 });
                 router.push("/cart"); // Diarahin ke cart aja dulu biar aman
                 router.refresh();
             } catch {
-                toast.error("Gagal proses beli langsung!");
+                toast.error("Unable to process your purchase. Please try again.");
             }
         });
     };
@@ -159,7 +159,7 @@ export default function ProductInfo({ product, isWishlisted }: ProductInfoProps)
                     onClick={() => {
                         startTransition(async () => {
                             await toggleWishlist(product.id);
-                            toast(isWishlisted ? "Dihapus dari wishlist" : "Masuk wishlist! ❤️");
+                            toast(isWishlisted ? "Removed from wishlist" : "Added to wishlist");
                         });
                     }}
                     className={`w-14 h-14 rounded-xl border-2 p-0 flex items-center justify-center transition-all active:scale-90

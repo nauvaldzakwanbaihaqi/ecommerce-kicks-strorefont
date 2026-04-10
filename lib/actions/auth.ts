@@ -27,7 +27,7 @@ export async function registerUser(prevState: FormState | null, formData: FormDa
     if (!validatedFields.success) {
         return {
             errors: validatedFields.error.flatten().fieldErrors,
-            message: "Cek lagi datanya mang, ada yang salah tuh.",
+            message: "Please review your information. Some fields contain errors.",
             fields: fieldsToReturn
         };
     }
@@ -37,7 +37,7 @@ export async function registerUser(prevState: FormState | null, formData: FormDa
     try {
         const existingUser = await prisma.user.findUnique({ where: { email } });
         if (existingUser) return {
-            message: "Email ini udah kedaftar mang!",
+            message: "This email address is already registered.",
             fields: fieldsToReturn
         };
 
@@ -53,10 +53,10 @@ export async function registerUser(prevState: FormState | null, formData: FormDa
             },
         });
 
-        return { success: "Akun berhasil dibuat! Silakan login mang." };
+        return { success: "Your account has been created successfully. Please sign in." };
     } catch {
         return {
-            message: "Waduh, ada masalah di server mang.",
+            message: "An unexpected server error occurred. Please try again later.",
             fields: fieldsToReturn
         };
     }

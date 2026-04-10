@@ -34,7 +34,7 @@ export default function CheckoutForm({ subtotal }: CheckoutFormProps) {
             await placeOrder(data);
         } catch (error: unknown) {
             if (error instanceof Error && error.message === "NEXT_REDIRECT") return;
-            toast.error("Gagal order mang! 😭");
+            toast.error("Order failed. Please review your details and try again.");
         } finally {
             setLoading(false);
         }
